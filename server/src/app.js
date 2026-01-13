@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth.routes');
 const gigRoutes = require('./routes/gigs.routes');
+const bidRoutes = require('./routes/bids.routes');
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use(limiter);
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/gigs', gigRoutes);
+app.use('/api/bids', bidRoutes);
 
 // Health Check
 app.get('/', (req, res) => {
