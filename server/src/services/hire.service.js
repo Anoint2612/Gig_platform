@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const Bid = require('../models/Bid');
 const Gig = require('../models/Gig');
+const Notification = require('../models/Notification');
+const { getIO } = require('../sockets');
 
 const hireFreelancerService = async (bidId, ownerId) => {
     const session = await mongoose.startSession();
@@ -43,8 +45,30 @@ const hireFreelancerService = async (bidId, ownerId) => {
             { session }
         );
 
+        // 4. Create Notification
+        const notification = new Notification({
+            recipientId: bid.freelancerId,
+            type: 'hired',
+            message: `You have been hired for the gig: ${gig.title}`,
+            data: { gigId: gig._id, gigTitle: gig.title },
+        });
+        await notification.save({ session });
+
         await session.commitTransaction();
         session.endSession();
+
+        // 5. Emit Socket Event (after commit)
+        try {
+            const io = getIO();
+            io.to(bid.freelancerId.toString()).emit('hired', {
+                gigId: gig._id,
+                title: gig.title,
+                message: `You have been hired for the gig: ${gig.title}`,
+            });
+        } catch (socketError) {
+            console.error('Socket emission failed:', socketError.message);
+            // Don't fail the transaction if socket fails
+        }
 
         return { gig, bid };
     } catch (error) {
