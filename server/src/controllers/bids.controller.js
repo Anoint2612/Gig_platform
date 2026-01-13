@@ -1,5 +1,6 @@
 const Bid = require('../models/Bid');
 const Gig = require('../models/Gig');
+const { hireFreelancerService } = require('../services/hire.service');
 
 // @desc    Create a new bid
 // @route   POST /api/bids
@@ -73,7 +74,31 @@ const getBidsByGigId = async (req, res) => {
     }
 };
 
+// @desc    Hire a freelancer for a gig
+// @route   PATCH /api/bids/:bidId/hire
+// @access  Private (Gig Owner)
+const hireFreelancer = async (req, res) => {
+    try {
+        const { bidId } = req.params;
+        const result = await hireFreelancerService(bidId, req.user._id);
+        res.json(result);
+    } catch (error) {
+        console.error(error);
+        if (error.message === 'Bid not found' || error.message === 'Gig not found') {
+            return res.status(404).json({ message: error.message });
+        }
+        if (error.message === 'Not authorized to hire for this gig') {
+            return res.status(403).json({ message: error.message });
+        }
+        if (error.message === 'Gig is not open for hiring') {
+            return res.status(409).json({ message: error.message });
+        }
+        res.status(500).json({ message: 'Server error during hiring process' });
+    }
+};
+
 module.exports = {
     createBid,
     getBidsByGigId,
+    hireFreelancer,
 };
