@@ -74,6 +74,21 @@ const getBidsByGigId = async (req, res) => {
     }
 };
 
+// @desc    Get current user's bids
+// @route   GET /api/bids/my-bids
+// @access  Private
+const getMyBids = async (req, res) => {
+    try {
+        const bids = await Bid.find({ freelancerId: req.user._id })
+            .populate('gigId', 'title status')
+            .sort({ createdAt: -1 });
+        res.json(bids);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 // @desc    Hire a freelancer for a gig
 // @route   PATCH /api/bids/:bidId/hire
 // @access  Private (Gig Owner)
@@ -100,5 +115,6 @@ const hireFreelancer = async (req, res) => {
 module.exports = {
     createBid,
     getBidsByGigId,
+    getMyBids,
     hireFreelancer,
 };

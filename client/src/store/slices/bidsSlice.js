@@ -10,6 +10,15 @@ export const fetchBidsByGigId = createAsyncThunk('bids/fetchBidsByGigId', async 
     }
 });
 
+export const fetchMyBids = createAsyncThunk('bids/fetchMyBids', async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get('/bids/my-bids');
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+});
+
 export const createBid = createAsyncThunk('bids/createBid', async (bidData, { rejectWithValue }) => {
     try {
         const response = await api.post('/bids', bidData);
@@ -47,6 +56,18 @@ const bidsSlice = createSlice({
                 state.bids = action.payload;
             })
             .addCase(fetchBidsByGigId.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message;
+            })
+            // Fetch My Bids
+            .addCase(fetchMyBids.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchMyBids.fulfilled, (state, action) => {
+                state.loading = false;
+                state.bids = action.payload;
+            })
+            .addCase(fetchMyBids.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message;
             })

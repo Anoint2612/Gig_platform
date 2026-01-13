@@ -55,16 +55,19 @@ router.post('/login', async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
+            console.log('Login failed: Missing email or password');
             return res.status(400).json({ message: 'Please provide email and password' });
         }
 
         const user = await User.findOne({ email });
         if (!user) {
+            console.log(`Login failed: User not found for email ${email}`);
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
+            console.log(`Login failed: Invalid password for email ${email}`);
             return res.status(400).json({ message: 'Invalid credentials' });
         }
 

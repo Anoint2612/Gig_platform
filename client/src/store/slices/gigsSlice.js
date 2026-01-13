@@ -10,6 +10,15 @@ export const fetchGigs = createAsyncThunk('gigs/fetchGigs', async ({ q = '', pag
     }
 });
 
+export const fetchMyGigs = createAsyncThunk('gigs/fetchMyGigs', async (_, { rejectWithValue }) => {
+    try {
+        const response = await api.get('/gigs/my-gigs');
+        return response.data;
+    } catch (error) {
+        return rejectWithValue(error.response.data);
+    }
+});
+
 export const fetchGigById = createAsyncThunk('gigs/fetchGigById', async (id, { rejectWithValue }) => {
     try {
         const response = await api.get(`/gigs/${id}`);
@@ -54,6 +63,18 @@ const gigsSlice = createSlice({
                 state.total = action.payload.total;
             })
             .addCase(fetchGigs.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message;
+            })
+            // Fetch My Gigs
+            .addCase(fetchMyGigs.pending, (state) => {
+                state.loading = true;
+            })
+            .addCase(fetchMyGigs.fulfilled, (state, action) => {
+                state.loading = false;
+                state.gigs = action.payload;
+            })
+            .addCase(fetchMyGigs.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload?.message;
             })

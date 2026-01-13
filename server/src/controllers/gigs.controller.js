@@ -57,6 +57,19 @@ const getGigs = async (req, res) => {
     }
 };
 
+// @desc    Get current user's gigs
+// @route   GET /api/gigs/my-gigs
+// @access  Private
+const getMyGigs = async (req, res) => {
+    try {
+        const gigs = await Gig.find({ ownerId: req.user._id }).sort({ createdAt: -1 });
+        res.json(gigs);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+};
+
 // @desc    Get gig by ID
 // @route   GET /api/gigs/:id
 // @access  Public
@@ -110,6 +123,7 @@ const updateGig = async (req, res) => {
 module.exports = {
     createGig,
     getGigs,
+    getMyGigs,
     getGigById,
     updateGig,
 };

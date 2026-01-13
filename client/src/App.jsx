@@ -9,9 +9,9 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import GigList from './pages/GigList';
+import Dashboard from './pages/Dashboard';
 
 // Placeholder Components (We'll implement these next)
-const Dashboard = () => <div className="container"><h1>Dashboard</h1></div>;
 const GigDetail = () => <div className="container"><h1>Gig Detail</h1></div>;
 
 // Private Route Wrapper
