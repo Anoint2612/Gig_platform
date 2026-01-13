@@ -5,6 +5,7 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth.routes');
+const gigRoutes = require('./routes/gigs.routes');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use(limiter);
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/gigs', gigRoutes);
 
 // Health Check
 app.get('/', (req, res) => {
